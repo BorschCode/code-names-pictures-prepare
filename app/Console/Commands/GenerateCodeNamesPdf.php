@@ -90,6 +90,8 @@ class GenerateCodeNamesPdf extends Command
                     self::IMAGE_SIZE,
                     'PNG',
                 );
+
+                $this->drawTopMarker($pdf, $x, $y);
             }
         }
 
@@ -99,6 +101,20 @@ class GenerateCodeNamesPdf extends Command
         $this->info("Total pages: {$pages->count()}");
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Draw a small filled triangle in the top-left corner of an image to indicate orientation.
+     */
+    private function drawTopMarker(TCPDF $pdf, float $x, float $y): void
+    {
+        $size = 3;
+
+        $pdf->SetFillColor(0, 0, 0);
+        $pdf->Polygon(
+            [$x, $y, $x + $size, $y, $x, $y + $size],
+            'F',
+        );
     }
 
     /**
