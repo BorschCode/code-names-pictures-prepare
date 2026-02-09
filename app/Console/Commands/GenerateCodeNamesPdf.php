@@ -67,6 +67,10 @@ class GenerateCodeNamesPdf extends Command
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(false);
         $pdf->SetAutoPageBreak(false);
+        $pdf->SetMargins(0, 0, 0);
+        $pdf->SetHeaderMargin(0);
+        $pdf->SetFooterMargin(0);
+        $pdf->SetCellPadding(0);
 
         $pages = $images->chunk(self::IMAGES_PER_PAGE);
 
