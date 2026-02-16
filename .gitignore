@@ -21,3 +21,9 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+/storage/code_names/*
+!/storage/code_names/.gitkeep
+/storage/code_names_pdf/*
+!/storage/code_names_pdf/.gitkeep
+/storage/code_names_resized/*
+!/storage/code_names_resized/.gitkeep

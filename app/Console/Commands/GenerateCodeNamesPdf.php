@@ -112,13 +112,28 @@ class GenerateCodeNamesPdf extends Command
      */
     private function drawTopMarker(TCPDF $pdf, float $x, float $y): void
     {
-        $size = 3;
+        $offset = 3.5;
+        $leg = 4.8;
+        $r = 1.2;
 
-        $pdf->SetFillColor(0, 0, 0);
+        $cornerX = $x + $offset;
+        $cornerY = $y + $offset;
+
+        $pdf->SetFillColor(180, 180, 180);
+
+        // Triangle body with the top-left corner cut off
         $pdf->Polygon(
-            [$x, $y, $x + $size, $y, $x, $y + $size],
+            [
+                $cornerX + $r, $cornerY,
+                $cornerX + $leg, $cornerY,
+                $cornerX, $cornerY + $leg,
+                $cornerX, $cornerY + $r,
+            ],
             'F',
         );
+
+        // Rounded arc filling the cut corner
+        $pdf->PieSector($cornerX + $r, $cornerY + $r, $r, 270, 360, 'F');
     }
 
     /**

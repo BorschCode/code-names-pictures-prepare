@@ -4,6 +4,9 @@ A Laravel-based utility for generating **print-ready Codenames-style cards** fro
 
 ---
 
+![Generated PDF](/docs/index.png)
+
+
 ## 🖼 Result & Examples
 
 ### Generated PDF (A4, double-sided, 3×4 grid)
@@ -13,6 +16,35 @@ A Laravel-based utility for generating **print-ready Codenames-style cards** fro
 ![Example cards](/docs/ExmapleImage4.png)
 
 > The output is a **well-formatted, two-sided A4 PDF**, optimized for clean cutting and gameplay.
+
+
+## 📦 Sample Data
+
+Example generated cards and demo assets are available here:
+
+[Example cards →](/docs/sample_data)
+
+---
+
+## 🖼 Image Optimization & Resize Command
+
+To normalize dimensions and reduce file size before PDF generation, run:
+
+```bash
+php artisan app:resize-code-names-images
+```
+
+The command includes an interactive menu for selecting resize mode and output format.
+
+**Interactive menu preview:**
+
+![Resize menu](/docs/resize.png)
+
+**Processing progress:**
+
+![Resize progress](/docs/resize_progress.png)
+
+All supported formats, resolution rules, and technical resize constraints are documented in: 🖼 Image Size Requirements
 
 ---
 
@@ -29,16 +61,29 @@ All card images **must** follow these rules to ensure visual consistency and pri
 - **Subject:** Exactly **one composite character per image**  
 - **Exclusions:** No text, letters, numbers, symbols, logos, or brands  
 - **Readability:** Instantly readable at small card size  
-- **Aspect ratio:** Square **1:1 (4×4)**  
+- **Aspect ratio:** Square **1:1 (4×4)**
 
 This style is **locked** and must be applied to all images.
 
 ---
 
+## 🖼 Image Size Requirements
+
+Each image is printed at **60×60 mm** (~2.36 inches) on the PDF.
+
+| Criteria        | Size (px)   | DPI | Notes                                      |
+|-----------------|-------------|-----|--------------------------------------------|
+| **Optimal**     | 709×709     | 300 | Best print quality, sharp at any distance  |
+| **Recommended** | 512×512     | 216 | Good quality, no visible pixelation        |
+| **Minimum**     | 354×354     | 150 | Acceptable quality, may look soft up close |
+
+> Images below 354×354 px will appear noticeably blurry when printed.
+> Non-square images will be stretched to fit the 1:1 cell.
+
+---
+
 ## 🖨 Printing Recommendations
 
-- **Best quality:** ✅ **300 PPI**  
-- **Acceptable:** ⚠️ **220 PPI**  
 - Use **double-sided printing**
 - Confirm your printer supports the selected PPI before printing
 
