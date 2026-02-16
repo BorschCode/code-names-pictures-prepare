@@ -74,10 +74,13 @@ class GenerateCodeNamesPdf extends Command
 
         $pages = $images->chunk(self::IMAGES_PER_PAGE);
 
-        foreach ($pages as $pageImages) {
+        foreach ($pages as $pageIndex => $pageImages) {
             $pdf->AddPage();
 
-            $this->drawCutLines($pdf, $marginX, $marginY);
+            $pageNumber = $pageIndex + 1;
+            if ($pageNumber % 2 !== 0) {
+                $this->drawCutLines($pdf, $marginX, $marginY);
+            }
 
             foreach ($pageImages->values() as $index => $image) {
                 $col = $index % self::COLUMNS;
