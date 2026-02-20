@@ -6,139 +6,186 @@ A Laravel-based utility for generating **print-ready Codenames-style cards** fro
 
 ![Generated PDF](/docs/index.png)
 
+---
 
-## 🖼 Result & Examples
+# 🖼 Result & Examples
 
-### Generated PDF (A4, double-sided, 3×4 grid)
+## Generated PDF (A4, double-sided, 3×4 grid)
+
 ![Generated PDF](/docs/result-pdf.png)
 
 ### Example Card Images
+
 ![Example cards](/docs/ExmapleImage4.png)
 
-> The output is a **well-formatted, two-sided A4 PDF**, optimized for clean cutting and gameplay.
+> The output is a **ready-to-print, duplex-optimized A4 PDF** prepared for clean cutting and gameplay.
 
+---
 
-## 📦 Sample Data
+# 🖨 Ready-to-Print PDF (Duplex Logic Explained)
 
-Example generated cards and demo assets are available here:
+The generator produces a **two-sided A4 PDF** with layout logic optimized for real-world printing:
+
+* Each page contains a fixed **3×4 grid**
+* Images are centered with calculated margins
+* TCPDF margins are fully removed (true edge alignment)
+
+### Duplex Alignment Strategy
+
+When printing double-sided:
+
+* **Odd pages (front side)** have no outer borders
+* This reduces visual cutting noise on the second side
+* It minimizes edge trash and alignment mismatch
+
+This makes the cards cleaner after cutting and improves duplex accuracy.
+
+If you notice offset during printing — that is usually a printer duplex calibration issue, not a layout bug.
+
+---
+
+# 📦 Sample Data
+
+Example generated cards and demo assets:
 
 [Example cards →](/docs/sample_data)
 
 ---
 
-## 🖼 Image Optimization & Resize Command
+# 🧠 Available Artisan Commands
 
-To normalize dimensions and reduce file size before PDF generation, run:
+You can list all project commands:
+
+```bash
+php artisan app:
+```
+
+Available commands:
+
+### Generate PDF
+
+```bash
+php artisan app:generate-code-names-pdf
+```
+
+Generate a printable A4 PDF with images arranged in a 3×4 grid.
+
+---
+
+### Resize Images
 
 ```bash
 php artisan app:resize-code-names-images
 ```
 
-The command includes an interactive menu for selecting resize mode and output format.
+Resize Code Names images to selected target size for optimal print quality.
 
-**Interactive menu preview:**
+Includes interactive menu:
 
 ![Resize menu](/docs/resize.png)
 
-**Processing progress:**
+Processing example:
 
 ![Resize progress](/docs/resize_progress.png)
 
-All supported formats, resolution rules, and technical resize constraints are documented in: 🖼 Image Size Requirements
+---
+
+### Convert Images to Grayscale
+
+```bash
+php artisan app:grayscale-code-names-images
+```
+
+Convert color images to grayscale (recommended for consistent deck style).
 
 ---
 
-## 🎨 Image Style & Prompt Rules (Style Lock)
+# 🖼 Image Size Requirements
 
-All card images **must** follow these rules to ensure visual consistency and print quality:
+Each image is printed at **60×60 mm (~2.36 inches)**.
 
-- **Style:** Flat board-game illustration  
-- **Shapes:** Bold, clean, distinct  
-- **Shading:** Minimal, flat tones only  
-- **Color palette:** **Black, white, grayscale only**  
-- **Background:** **Solid white** (preferred) or printer-safe gray  
-- **Tone:** Whimsical, surreal  
-- **Subject:** Exactly **one composite character per image**  
-- **Exclusions:** No text, letters, numbers, symbols, logos, or brands  
-- **Readability:** Instantly readable at small card size  
-- **Aspect ratio:** Square **1:1 (4×4)**
+| Criteria        | Size (px) | DPI | Notes                |
+| --------------- | --------- | --- | -------------------- |
+| **Optimal**     | 709×709   | 300 | Best print sharpness |
+| **Recommended** | 512×512   | 216 | Good balance         |
+| **Minimum**     | 354×354   | 150 | May appear soft      |
 
-This style is **locked** and must be applied to all images.
+⚠ Images below 354×354 px will appear blurry when printed.
+⚠ Non-square images are forced into 1:1 cells.
 
 ---
 
-## 🖼 Image Size Requirements
+# 🎨 Image Style Rules (Locked)
 
-Each image is printed at **60×60 mm** (~2.36 inches) on the PDF.
+All images must follow strict style rules:
 
-| Criteria        | Size (px)   | DPI | Notes                                      |
-|-----------------|-------------|-----|--------------------------------------------|
-| **Optimal**     | 709×709     | 300 | Best print quality, sharp at any distance  |
-| **Recommended** | 512×512     | 216 | Good quality, no visible pixelation        |
-| **Minimum**     | 354×354     | 150 | Acceptable quality, may look soft up close |
+* Flat board-game illustration
+* Bold, clean shapes
+* Minimal shading
+* Black / white / grayscale only
+* Solid white background
+* One composite character per image
+* No text, logos, numbers, symbols
+* Square 1:1 format
 
-> Images below 354×354 px will appear noticeably blurry when printed.
-> Non-square images will be stretched to fit the 1:1 cell.
-
----
-
-## 🖨 Printing Recommendations
-
-- Use **double-sided printing**
-- Confirm your printer supports the selected PPI before printing
+This ensures visual consistency across decks.
 
 ---
 
-## 🧠 How the Generator Works
+# 🖨 Printing Recommendations
 
-1. Loads images from `storage/code_names`
-2. Randomly selects and arranges them
-3. Generates a **two-sided A4 PDF**
-4. Outputs a file ready for cutting and play
-
----
-
-## 🚀 Tech Stack
-
-- **Framework:** Laravel 12  
-- **Runtime:** Docker (Laravel Sail–compatible)  
-- **Output:** A4 PDF (print-ready)  
-- **Assets:** Local storage (`storage/code_names`)  
+* Use **double-sided printing**
+* Use 220–300 GSM paper for durability
+* Confirm printer supports 300 DPI
+* Enable duplex alignment correction if available
 
 ---
 
-## 🛠 Installation & Setup
+# 🚀 Tech Stack
 
-### Prerequisites
-- Docker Desktop
-- Docker Compose
-- Git
+* Laravel 12
+* Docker (Sail-compatible runtime)
+* TCPDF
+* Local image storage
 
-> Composer is installed inside the container — no local Composer required.
+---
 
-### Clone the Repository
+# 🛠 Installation & Setup
+
+## Requirements
+
+* Docker Desktop
+* Docker Compose
+* Git
+
+---
+
+## Clone
+
 ```bash
 git clone git@github.com:your-username/codenames-project.git
 cd codenames-project
-````
+```
 
-### Start the Environment
+---
 
-Laravel Sail is not preconfigured yet, so use Docker directly:
+## Start Environment
 
 ```bash
 docker compose up -d
 docker compose run --rm laravel.test composer install
 ```
 
-### Application Setup
+---
+
+## Setup Application
 
 ```bash
 docker compose exec laravel.test php artisan key:generate
 docker compose exec laravel.test php artisan migrate
 ```
 
-(Optional) Enter the container shell:
+Optional shell:
 
 ```bash
 docker compose exec laravel.test bash
@@ -146,28 +193,26 @@ docker compose exec laravel.test bash
 
 ---
 
-## 🎮 Card Generator Command
-
-Run inside the container:
+## Generate Cards
 
 ```bash
 php artisan app:generate-code-names-pdf
 ```
 
-**Description:**
-Generate a printable **A4 PDF** with Codenames images arranged in a **3×4 grid**.
+Output file:
 
-![CLI command example](/docs/cli-command-run.png)
+```
+storage/code_names_pdf/code_names.pdf
+```
 
 ---
 
-## 📌 Notes
+# 📌 Notes
 
-* Focused on **print quality**, not gameplay logic
-* Perfect for custom decks, prototypes, or gifts
-* Image sets can be swapped without code changes
+* This is a **print-focused generator**, not a gameplay engine
+* Image sets are fully swappable
+* Layout is optimized for physical card cutting
 
+---
 
-```
-Have fun generating and printing your own Codenames decks 🎲🃏
-```
+Have fun generating and printing your own Codenames decks 🎲

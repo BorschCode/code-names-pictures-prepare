@@ -27,3 +27,5 @@ yarn-error.log
 !/storage/code_names_pdf/.gitkeep
 /storage/code_names_resized/*
 !/storage/code_names_resized/.gitkeep
+/storage/code_names_grayscale/*
+!/storage/code_names_grayscale/.gitkeep
