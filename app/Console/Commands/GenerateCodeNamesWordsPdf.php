@@ -9,7 +9,7 @@ use TCPDF;
 class GenerateCodeNamesWordsPdf extends Command
 {
     protected $signature = 'app:generate-code-names-words-pdf {file}';
-    protected $description = 'Generate CodeNames PDF: 2 words per card (Large + Mirrored Small with Icon)';
+    protected $description = 'Generate CodeNames PDF: Strict layout orientation';
 
     private const COLS = 4;
     private const ROWS = 4;
@@ -19,7 +19,8 @@ class GenerateCodeNamesWordsPdf extends Command
     private const START_Y = 15;
     private const CELL_W = 65;
     private const CELL_H = 45;
-    private const ICON_SIZE = 6;
+    private const ICON_SIZE = 7;
+    private const COMPASS_CIRCLE_RADIUS = 2.5;
 
     public function handle(): int
     {
@@ -42,13 +43,10 @@ class GenerateCodeNamesWordsPdf extends Command
         $pdf->SetMargins(0, 0, 0);
         $pdf->SetAutoPageBreak(false);
 
-        $perPage = self::COLS * self::ROWS;
-
-        foreach (array_chunk($words, $perPage) as $pageIndex => $chunk) {
+        foreach (array_chunk($words, self::COLS * self::ROWS) as $pageIndex => $chunk) {
             $pdf->AddPage();
-
-            // Grid тільки на непарних сторінках
             $isBackside = ($pageIndex % 2 === 1);
+
             if (!$isBackside) {
                 $this->drawGrid($pdf);
             }
@@ -57,7 +55,6 @@ class GenerateCodeNamesWordsPdf extends Command
                 $col = $i % self::COLS;
                 $row = intdiv($i, self::COLS);
 
-                // Дзеркальне відображення колонок для backside (дуплекс)
                 if ($isBackside) {
                     $x = self::PAGE_W - self::START_X - ($col + 1) * self::CELL_W;
                 } else {
@@ -65,15 +62,15 @@ class GenerateCodeNamesWordsPdf extends Command
                 }
                 $y = self::START_Y + $row * self::CELL_H;
 
-                $this->drawSingleCardLayout($pdf, $x, $y, $word);
+                $this->drawSingleCard($pdf, $x, $y, $word);
             }
         }
 
-        $output = storage_path('code_names_pdf/code_names_v3.pdf');
+        $output = storage_path('code_names_pdf/code_names_fixed.pdf');
         File::ensureDirectoryExists(dirname($output));
         $pdf->Output($output, 'F');
 
-        $this->info("Saved to: {$output}");
+        $this->info("Готово: {$output}");
         return self::SUCCESS;
     }
 
@@ -86,7 +83,6 @@ class GenerateCodeNamesWordsPdf extends Command
     {
         $pdf->SetDrawColor(180, 180, 180);
         $pdf->SetLineWidth(0.1);
-
         for ($c = 0; $c <= self::COLS; $c++) {
             $x = self::START_X + $c * self::CELL_W;
             $pdf->Line($x, self::START_Y, $x, self::START_Y + self::ROWS * self::CELL_H);
@@ -97,43 +93,52 @@ class GenerateCodeNamesWordsPdf extends Command
         }
     }
 
-    private function drawSingleCardLayout(TCPDF $pdf, float $x, float $y, string $word): void
+    private function drawSingleCard(TCPDF $pdf, float $x, float $y, string $word): void
     {
         $word = mb_strtoupper($word);
         $iconPath = storage_path('code_names/icon.png');
 
-        // 1. ВЕЛИКЕ СЛОВО (зверху, прямо)
-        $pdf->SetTextColor(30, 30, 30); // Grayscale майже чорний
-        $pdf->SetFont('dejavusans', 'B', 18);
+        // --- ВЕРХНЯ ЧАСТИНА (ПРЯМА) ---
+
+        // 1. Circle (строго центр верх)
+        $pdf->SetFillColor(60, 60, 60);
+        $pdf->Circle($x + (self::CELL_W / 2), $y + 4, self::COMPASS_CIRCLE_RADIUS, 0, 360, 'F');
+
+        // 2. Велике слово
+        $pdf->SetFont('dejavusans', 'B', 20);
+        $pdf->SetTextColor(20, 20, 20);
         $pdf->SetXY($x, $y + 8);
         $pdf->Cell(self::CELL_W, 10, $word, 0, 0, 'C');
 
-        // 2. Divider line (рівно по центру картки)
-        $pdf->SetDrawColor(160, 160, 160);
-        $pdf->SetLineWidth(0.2);
-        $pdf->Line($x + 6, $y + (self::CELL_H / 2), $x + self::CELL_W - 6, $y + (self::CELL_H / 2));
+        // 3. Divider (під великим словом)
+        $pdf->SetDrawColor(140, 140, 140);
+        $pdf->SetLineWidth(0.4);
+        $pdf->Line($x + 6, $y + 20, $x + self::CELL_W - 6, $y + 20);
 
-        // 3. маленьке слово + іконка (ЗНИЗУ, ПЕРЕВЕРНУТЕ)
-        // Повертаємо тільки нижню частину
+
+        // --- НИЖНЯ ЧАСТИНА (ПЕРЕВЕРНУТА НА 180) ---
+
         $pdf->StartTransform();
-        // Робимо поворот навколо центру картки
-        $pdf->Rotate(180, $x + self::CELL_W / 2, $y + self::CELL_H / 2);
+        // Поворот навколо центру картки
+        $pdf->Rotate(180, $x + (self::CELL_W / 2), $y + (self::CELL_H / 2));
 
-        // Малюємо мале слово так само, як велике, але в "своїй" половині
+        /* * Оскільки ми перевернули весь простір, "верх" став "низом".
+         * Щоб текст опинився внизу фізичної картки, ми малюємо його в "новому верху".
+         */
+
+        // Мале слово (центроване)
         $pdf->SetFont('dejavusans', '', 11);
-        $pdf->SetTextColor(100, 100, 100); // Grayscale сірий
+        $pdf->SetTextColor(80, 80, 80);
+        // Ставимо Y так, щоб воно було симетрично нижній частині
+        $pdf->SetXY($x, $y + 8);
+        $pdf->Cell(self::CELL_W, 8, $word, 0, 0, 'C');
 
-        // Координата Y для малого слова після повороту
-        // (воно опиниться внизу картки, якщо дивитись прямо)
-        $pdf->SetXY($x + 5, $y + 8);
-        $pdf->Cell(self::CELL_W - 15, 10, $word, 0, 0, 'L');
-
-        // Іконка на рівні малого слова
+        // Іконка праворуч від малого слова
         if (file_exists($iconPath)) {
             $pdf->Image(
                 $iconPath,
                 $x + self::CELL_W - self::ICON_SIZE - 6,
-                $y + 10,
+                $y + 8.5, // Центруємо відносно тексту
                 self::ICON_SIZE,
                 self::ICON_SIZE
             );
