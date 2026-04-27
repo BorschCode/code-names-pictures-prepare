@@ -9,7 +9,7 @@ use TCPDF;
 class GenerateCodeNamesWordsPdf extends Command
 {
     protected $signature = 'app:generate-code-names-words-pdf {file}';
-    protected $description = 'Generate CodeNames PDF: Strict layout orientation';
+    protected $description = 'Generate CodeNames PDF: Ring style, random icons from storage/icons with rotation';
 
     private const COLS = 4;
     private const ROWS = 4;
@@ -66,11 +66,11 @@ class GenerateCodeNamesWordsPdf extends Command
             }
         }
 
-        $output = storage_path('code_names_pdf/code_names_fixed.pdf');
+        $output = storage_path('code_names_pdf/code_names_final.pdf');
         File::ensureDirectoryExists(dirname($output));
         $pdf->Output($output, 'F');
 
-        $this->info("Готово: {$output}");
+        $this->info("Готово! Файл збережено: {$output}");
         return self::SUCCESS;
     }
 
@@ -96,52 +96,64 @@ class GenerateCodeNamesWordsPdf extends Command
     private function drawSingleCard(TCPDF $pdf, float $x, float $y, string $word): void
     {
         $word = mb_strtoupper($word);
-        $iconPath = storage_path('code_names/icon.png');
+
+        // --- ЛОГІКА ІКОНОК ---
+        $iconsDir = storage_path('icons');
+        $iconFiles = glob($iconsDir . '/*.png');
+        $randomIcon = !empty($iconFiles) ? $iconFiles[array_rand($iconFiles)] : null;
 
         // --- ВЕРХНЯ ЧАСТИНА (ПРЯМА) ---
 
-        // 1. Circle (строго центр верх)
-        $pdf->SetFillColor(60, 60, 60);
-        $pdf->Circle($x + (self::CELL_W / 2), $y + 4, self::COMPASS_CIRCLE_RADIUS, 0, 360, 'F');
+        // 1. Circle "Колесо"
+        $pdf->SetDrawColor(40, 40, 40);
+        $pdf->SetLineWidth(0.6);
+        $pdf->Circle($x + (self::CELL_W / 2), $y + 5, self::COMPASS_CIRCLE_RADIUS, 0, 360, 'D');
 
         // 2. Велике слово
         $pdf->SetFont('dejavusans', 'B', 20);
         $pdf->SetTextColor(20, 20, 20);
-        $pdf->SetXY($x, $y + 8);
+        $pdf->SetXY($x, $y + 10);
         $pdf->Cell(self::CELL_W, 10, $word, 0, 0, 'C');
 
-        // 3. Divider (під великим словом)
-        $pdf->SetDrawColor(140, 140, 140);
+        // 3. Divider
+        $pdf->SetDrawColor(150, 150, 150);
         $pdf->SetLineWidth(0.4);
-        $pdf->Line($x + 6, $y + 20, $x + self::CELL_W - 6, $y + 20);
+        $pdf->Line($x + 8, $y + 21, $x + self::CELL_W - 8, $y + 21);
 
 
         // --- НИЖНЯ ЧАСТИНА (ПЕРЕВЕРНУТА НА 180) ---
 
         $pdf->StartTransform();
-        // Поворот навколо центру картки
         $pdf->Rotate(180, $x + (self::CELL_W / 2), $y + (self::CELL_H / 2));
 
-        /* * Оскільки ми перевернули весь простір, "верх" став "низом".
-         * Щоб текст опинився внизу фізичної картки, ми малюємо його в "новому верху".
-         */
-
-        // Мале слово (центроване)
+        // Мале слово
         $pdf->SetFont('dejavusans', '', 11);
         $pdf->SetTextColor(80, 80, 80);
-        // Ставимо Y так, щоб воно було симетрично нижній частині
-        $pdf->SetXY($x, $y + 8);
-        $pdf->Cell(self::CELL_W, 8, $word, 0, 0, 'C');
+        $pdf->SetXY($x + 5, $y + 7);
+        $pdf->Cell(self::CELL_W - 15, 8, $word, 0, 0, 'L');
 
-        // Іконка праворуч від малого слова
-        if (file_exists($iconPath)) {
+        // Іконка з випадковим поворотом
+        if ($randomIcon && file_exists($randomIcon)) {
+            $randomRotation = rand(-20, 20);
+
+            // Координати центру іконки для повороту
+            $iconX = $x + self::CELL_W - self::ICON_SIZE - 6;
+            $iconY = $y + 7.5;
+            $centerX = $iconX + (self::ICON_SIZE / 2);
+            $centerY = $iconY + (self::ICON_SIZE / 2);
+
+            $pdf->StartTransform();
+            // Повертаємо саму іконку навколо її власного центру
+            $pdf->Rotate($randomRotation, $centerX, $centerY);
+
             $pdf->Image(
-                $iconPath,
-                $x + self::CELL_W - self::ICON_SIZE - 6,
-                $y + 8.5, // Центруємо відносно тексту
+                $randomIcon,
+                $iconX,
+                $iconY,
                 self::ICON_SIZE,
                 self::ICON_SIZE
             );
+            $pdf->StopTransform();
         }
 
         $pdf->StopTransform();
