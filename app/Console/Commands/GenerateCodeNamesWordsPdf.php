@@ -9,7 +9,7 @@ use TCPDF;
 class GenerateCodeNamesWordsPdf extends Command
 {
     protected $signature = 'app:generate-code-names-words-pdf {file}';
-    protected $description = 'Generate CodeNames PDF: Ring style, random icons from storage/icons with rotation';
+    protected $description = 'Generate CodeNames PDF: Large random icons, no rotation, wheel circle style';
 
     private const COLS = 4;
     private const ROWS = 4;
@@ -19,7 +19,9 @@ class GenerateCodeNamesWordsPdf extends Command
     private const START_Y = 15;
     private const CELL_W = 65;
     private const CELL_H = 45;
-    private const ICON_SIZE = 7;
+
+    // Збільшений розмір іконки для кращої пропорції
+    private const ICON_SIZE = 12;
     private const COMPASS_CIRCLE_RADIUS = 2.5;
 
     public function handle(): int
@@ -66,11 +68,11 @@ class GenerateCodeNamesWordsPdf extends Command
             }
         }
 
-        $output = storage_path('code_names_pdf/code_names_final.pdf');
+        $output = storage_path('code_names_pdf/code_names_fixed_final.pdf');
         File::ensureDirectoryExists(dirname($output));
         $pdf->Output($output, 'F');
 
-        $this->info("Готово! Файл збережено: {$output}");
+        $this->info("PDF успішно створено: {$output}");
         return self::SUCCESS;
     }
 
@@ -97,14 +99,14 @@ class GenerateCodeNamesWordsPdf extends Command
     {
         $word = mb_strtoupper($word);
 
-        // --- ЛОГІКА ІКОНОК ---
+        // Випадкова іконка з папки storage/icons/
         $iconsDir = storage_path('icons');
         $iconFiles = glob($iconsDir . '/*.png');
         $randomIcon = !empty($iconFiles) ? $iconFiles[array_rand($iconFiles)] : null;
 
         // --- ВЕРХНЯ ЧАСТИНА (ПРЯМА) ---
 
-        // 1. Circle "Колесо"
+        // 1. Circle "Колесо" (зверху по центру)
         $pdf->SetDrawColor(40, 40, 40);
         $pdf->SetLineWidth(0.6);
         $pdf->Circle($x + (self::CELL_W / 2), $y + 5, self::COMPASS_CIRCLE_RADIUS, 0, 360, 'D');
@@ -121,7 +123,7 @@ class GenerateCodeNamesWordsPdf extends Command
         $pdf->Line($x + 8, $y + 21, $x + self::CELL_W - 8, $y + 21);
 
 
-        // --- НИЖНЯ ЧАСТИНА (ПЕРЕВЕРНУТА НА 180) ---
+        // --- НИЖНЯ ЧАСТИНА (ПЕРЕВЕРНУТА) ---
 
         $pdf->StartTransform();
         $pdf->Rotate(180, $x + (self::CELL_W / 2), $y + (self::CELL_H / 2));
@@ -129,31 +131,19 @@ class GenerateCodeNamesWordsPdf extends Command
         // Мале слово
         $pdf->SetFont('dejavusans', '', 11);
         $pdf->SetTextColor(80, 80, 80);
-        $pdf->SetXY($x + 5, $y + 7);
-        $pdf->Cell(self::CELL_W - 15, 8, $word, 0, 0, 'L');
+        // Зміщуємо текст трохи лівіше, щоб велика іконка не налізала
+        $pdf->SetXY($x + 4, $y + 6);
+        $pdf->Cell(self::CELL_W - 20, 12, $word, 0, 0, 'L');
 
-        // Іконка з випадковим поворотом
+        // Велика випадкова іконка (без ротації)
         if ($randomIcon && file_exists($randomIcon)) {
-            $randomRotation = rand(-20, 20);
-
-            // Координати центру іконки для повороту
-            $iconX = $x + self::CELL_W - self::ICON_SIZE - 6;
-            $iconY = $y + 7.5;
-            $centerX = $iconX + (self::ICON_SIZE / 2);
-            $centerY = $iconY + (self::ICON_SIZE / 2);
-
-            $pdf->StartTransform();
-            // Повертаємо саму іконку навколо її власного центру
-            $pdf->Rotate($randomRotation, $centerX, $centerY);
-
             $pdf->Image(
                 $randomIcon,
-                $iconX,
-                $iconY,
+                $x + self::CELL_W - self::ICON_SIZE - 5, // Відступ справа
+                $y + 6,                                // Позиція зверху (в перевернутому блоці)
                 self::ICON_SIZE,
                 self::ICON_SIZE
             );
-            $pdf->StopTransform();
         }
 
         $pdf->StopTransform();
