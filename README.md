@@ -136,6 +136,7 @@ This ensures visual consistency across decks.
 
 ```bash
 php artisan app:generate-code-names-words-pdf {file.txt}
+```
 Generates a printable A4 PDF containing word-based cards (Codenames style) from a text file. Each card features:
 
 Orientation Mark: A "wheel-style" circle at the top center for easy sorting.
@@ -191,7 +192,7 @@ MOUNTAIN
 ## Clone
 
 ```bash
-git clone git@github.com:your-username/codenames-project.git
+git clone https://github.com/BorschCode/code-names-pictures-prepare.git
 cd codenames-project
 ```
 
