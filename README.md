@@ -132,6 +132,34 @@ This ensures visual consistency across decks.
 
 ---
 
+### Generate Word Cards PDF
+
+```bash
+php artisan app:generate-code-names-words-pdf {file.txt}
+Generates a printable A4 PDF containing word-based cards (Codenames style) from a text file. Each card features:
+
+Orientation Mark: A "wheel-style" circle at the top center for easy sorting.
+
+Primary Word: Large, bold centered text.
+
+Divider: A clean separator line.
+
+Duplex Text: A mirrored, medium-sized version of the word at the bottom.
+
+Random Branding: A randomly selected icon from storage/icons/ placed next to the mirrored text.
+
+📝 Word File Format
+For the app:generate-code-names-words-pdf command, provide a simple .txt file where each line represents one card:
+
+Plaintext
+CROWN
+SUN
+BREEZE
+MOUNTAIN
+
+
+
+
 # 🖨 Printing Recommendations
 
 * Use **double-sided printing**
