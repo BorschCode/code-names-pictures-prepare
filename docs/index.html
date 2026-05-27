@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,13 +15,11 @@
     <style>
         body {
             font-family: 'Instrument Sans', sans-serif;
-            /* Grayscale radial gradient for a "studio" look */
             background: radial-gradient(circle, #2c2c2c 0%, #000000 100%);
         }
 
         .contrast-text {
             color: #ffffff;
-            /* Subtle white glow shadow for high contrast */
             text-shadow: 0 0 15px rgba(255, 255, 255, 0.3), 0 2px 4px rgba(0,0,0,0.5);
         }
 
@@ -37,27 +35,6 @@
     </style>
 </head>
 <body class="antialiased text-zinc-300 flex p-6 lg:p-8 items-center lg:justify-center min-h-screen flex-col">
-
-<header class="w-full lg:max-w-4xl max-w-[335px] text-sm mb-6">
-    @if (Route::has('login'))
-        <nav class="flex items-center justify-end gap-4">
-            @auth
-                <a href="{{ url('/dashboard') }}" class="px-5 py-1.5 text-white border border-zinc-700 hover:border-white rounded-md transition-all">
-                    Dashboard
-                </a>
-            @else
-                <a href="{{ route('login') }}" class="px-5 py-1.5 text-zinc-400 hover:text-white transition-all">
-                    Log in
-                </a>
-                @if (Route::has('register'))
-                    <a href="{{ route('register') }}" class="px-5 py-1.5 text-white border border-zinc-700 hover:border-white rounded-md transition-all">
-                        Register
-                    </a>
-                @endif
-            @endauth
-        </nav>
-    @endif
-</header>
 
 <div class="flex items-center justify-center w-full transition-opacity duration-750 lg:grow">
     <main class="w-full max-w-4xl glass-panel rounded-2xl p-8 lg:p-12 shadow-2xl">
@@ -114,7 +91,7 @@
 
                     <div class="border-t border-zinc-900 pt-6">
                         <code class="text-green-400 font-mono text-sm block">
-                            php artisan app:generate-code-names-words-pdf
+                            php artisan app:generate-code-names-words-pdf {file}
                         </code>
                         <p class="mt-1.5 text-zinc-500 text-xs leading-relaxed pl-1">
                             Generate CodeNames PDF with larger mirrored font, large rotated icons, and wheel circle style.
@@ -153,7 +130,6 @@
                 <div class="space-y-3">
                     <div class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-3 items-start">
 
-                        {{-- Inputs --}}
                         <span class="text-xs font-semibold text-zinc-600 uppercase tracking-widest pt-0.5 whitespace-nowrap">Input</span>
                         <div class="space-y-2">
                             <div class="flex flex-col sm:flex-row sm:items-baseline gap-x-3 gap-y-0.5">
@@ -166,12 +142,11 @@
                             </div>
                             <div class="flex flex-col sm:flex-row sm:items-baseline gap-x-3 gap-y-0.5">
                                 <code class="text-yellow-400 font-mono text-xs whitespace-nowrap">storage/words.txt</code>
-                                <span class="text-zinc-500 text-xs">Word list (one word per line) — passed as <code class="text-zinc-400">{{'{'}}file{'}'}</code> argument to the words command</span>
+                                <span class="text-zinc-500 text-xs">Word list (one word per line) — passed as <code class="text-zinc-400">{file}</code> argument to the words command</span>
                             </div>
                         </div>
 
-                        {{-- Outputs --}}
-                        <span class="text-xs font-semibold text-zinc-600 uppercase tracking-widest pt-0.5 whitespace-nowrap border-t border-zinc-900 pt-4">Output</span>
+                        <span class="text-xs font-semibold text-zinc-600 uppercase tracking-widest pt-4 whitespace-nowrap border-t border-zinc-900">Output</span>
                         <div class="space-y-2 border-t border-zinc-900 pt-4">
                             <div class="flex flex-col sm:flex-row sm:items-baseline gap-x-3 gap-y-0.5">
                                 <code class="text-zinc-400 font-mono text-xs whitespace-nowrap">storage/code_names_pdf/</code>
@@ -196,7 +171,7 @@
 </div>
 
 <footer class="mt-8 text-zinc-600 text-xs">
-    &copy; {{ date('Y') }} — Codenames Engine v2.0
+    &copy; 2026 — Codenames Engine v2.0
 </footer>
 </body>
 </html>
