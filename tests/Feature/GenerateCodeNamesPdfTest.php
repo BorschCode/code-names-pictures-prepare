@@ -2,6 +2,23 @@
 
 use Illuminate\Support\Facades\File;
 
+beforeEach(function () {
+    $this->sourceDir = storage_path('code_names');
+    $this->fixtureImage = $this->sourceDir . '/__test_fixture.png';
+
+    File::ensureDirectoryExists($this->sourceDir);
+
+    $img = imagecreatetruecolor(100, 100);
+    $color = imagecolorallocate($img, 80, 120, 160);
+    imagefill($img, 0, 0, $color);
+    imagepng($img, $this->fixtureImage);
+    imagedestroy($img);
+});
+
+afterEach(function () {
+    File::delete($this->fixtureImage);
+});
+
 test('pdf grid is symmetrically centered on A4 page for duplex printing', function () {
     $imageSize = 60;
     $columns = 3;

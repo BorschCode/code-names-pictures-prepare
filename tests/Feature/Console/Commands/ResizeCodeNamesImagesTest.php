@@ -3,13 +3,23 @@
 use Illuminate\Support\Facades\File;
 
 beforeEach(function () {
+    $this->sourceDir = storage_path('code_names');
     $this->outputDir = storage_path('code_names_resized');
+    $this->fixtureImage = $this->sourceDir . '/__test_fixture.png';
 
+    File::ensureDirectoryExists($this->sourceDir);
     File::ensureDirectoryExists($this->outputDir);
     File::cleanDirectory($this->outputDir);
+
+    $img = imagecreatetruecolor(800, 800);
+    $color = imagecolorallocate($img, 100, 150, 200);
+    imagefill($img, 0, 0, $color);
+    imagepng($img, $this->fixtureImage);
+    imagedestroy($img);
 });
 
 afterEach(function () {
+    File::delete($this->fixtureImage);
     File::cleanDirectory($this->outputDir);
 });
 

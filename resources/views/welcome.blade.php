@@ -71,6 +71,15 @@
             Optimized for <span class="text-white">A4 duplex printing</span> with zero-margin precision.
         </p>
 
+        <a href="https://borschcode.github.io/code-names-pictures-prepare/"
+           target="_blank"
+           class="mt-4 inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-white transition-colors">
+            <svg class="size-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+            </svg>
+            borschcode.github.io/code-names-pictures-prepare
+        </a>
+
         <div class="mt-12 grid gap-8 md:grid-cols-3">
             <div class="group">
                 <h3 class="font-medium text-white text-lg group-hover:text-blue-400 transition-colors">🖨 Printable PDF</h3>

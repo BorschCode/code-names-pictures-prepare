@@ -2,6 +2,8 @@
 
 A Laravel-based utility for generating **print-ready Codenames-style cards** from custom image assets.
 
+🌐 **[Live Documentation →](https://borschcode.github.io/code-names-pictures-prepare/)**
+
 ---
 
 ![Generated PDF](/docs/index.png)
